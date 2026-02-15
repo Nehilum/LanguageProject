@@ -1,0 +1,23 @@
+# Ignore everything
+*
+
+# Allow directories to be searched
+!*/
+
+# Allow specific root files
+!/*.md
+!/*.sh
+
+# Allow all python files (recursive)
+!**/*.py
+
+# Allow figures directory content
+!/figures/
+!/figures/*
+
+# Specifically ignore common artifacts that might be caught by the above
+**/.DS_Store
+**/__pycache__/
+*.pyc
+# Don't ignore the gitignore itself
+!.gitignore
