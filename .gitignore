@@ -1,23 +1,18 @@
-# Ignore everything
+# Ignore everything by default
 *
 
 # Allow directories to be searched
 !*/
 
-# Allow specific root files
-!/*.md
-!/*.sh
-
-# Allow all python files (recursive)
+# Allow specific file types
 !**/*.py
+!**/*.sh
 
-# Allow figures directory content
-!/figures/
-!/figures/*
+# Specifically allow the gitignore itself
+!.gitignore
 
-# Specifically ignore common artifacts that might be caught by the above
+# Specifically ignore common artifacts and environment-specific files
 **/.DS_Store
 **/__pycache__/
 *.pyc
-# Don't ignore the gitignore itself
-!.gitignore
+.ipynb_checkpoints/
