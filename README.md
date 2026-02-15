@@ -14,9 +14,6 @@ This repository is a filtered subset of the full analysis pipeline, focusing on 
     - `analysis/`: Core statistical and hypothesis testing scripts (Gating, PAC, ITC, etc.).
     - `glm_analysis/`: Time-resolved hierarchical GLM implementation.
     - `visualization/`: Utility scripts for generating figures and sensor-level plots.
-- `figures/`: High-resolution PNGs of the primary results (Figures 1-3).
-- `docs/`: Supplemental documentation and manifest files.
-- `*.md`: Scientific narrative, methods, and results documentation.
 - `*.sh`: Shell scripts for running the full analysis pipeline.
 
 ### Core Dependencies
