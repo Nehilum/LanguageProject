@@ -12,17 +12,6 @@ The core objective of this study is to test the "Language of Thought" hypothesis
 3.  **Capacity Limit**: A universal breakdown of complexity tracking occurs as sequence length exceeds ~12 items.
 4.  **Dynamical Regime Shift**: State-space analysis reveals that cognitive overload is marked by neural trajectories "escaping" the computational manifold into a disjoint, passive attractor state.
 
-## 📊 Key Results
-
-| Figure | Title | Description |
-| :--- | :--- | :--- |
-| **Figure 1** | **Sensitivity & Pipeline** | Demonstrates robust auditory responsiveness and sequence tracking in short regimes. |
-| **Figure 2** | **Strategy & Collapse** | Highlights individual strategy dissociation (Boss vs. Carol) and the universal gating effect (Collapse) in long sequences. |
-| **Figure 3** | **Dynamical Mechanism** | Visualizes the "Regime Shift" where neural trajectories diverge from the stable manifold as memory capacity is exceeded. |
-
-> [!NOTE]
-> Detailed descriptions of these figures can be found in [Figure_Detailed.md](./Figure_Detailed.md).
-
 ## 📂 Repository Structure
 
 This repository is a filtered subset of the full analysis pipeline, focusing on reproducibility and visualization.
@@ -36,10 +25,6 @@ This repository is a filtered subset of the full analysis pipeline, focusing on 
 - `*.md`: Scientific narrative, methods, and results documentation.
 - `*.sh`: Shell scripts for running the full analysis pipeline.
 
-## 🛠 Analysis Pipeline
-
-The full execution flow is documented in [Pipeline_Manifest.md](./Pipeline_Manifest.md). 
-
 ### Core Dependencies
 - **Data Prep**: `prepare_glm_data.py`
 - **Gating**: `analyze_gating_hypothesis.py`
@@ -51,12 +36,6 @@ To reproduce the results (assuming access to the derivatives/ dataset):
 ```bash
 bash run_full_analysis.sh
 ```
-
-## 📄 Documentation
-- [Paper Draft](./Paper_Draft.md): Detailed methodology and written results.
-- [Methods](./Methods_Detailed.md): Precise technical specifications of the ECoG recording and filtering.
-- [StoryLine](./StoryLine.md): The scientific narrative and interpretation framework.
-
 ---
-**Contact:** [User Name/Email]  
+**Contact:** nehilum.0@gmail.com  
 **Year:** 2026
