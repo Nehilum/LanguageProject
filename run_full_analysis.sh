@@ -60,29 +60,60 @@ for data_type in "${DATA_TYPES[@]}"; do
             --data_type "$data_type" \
             --baseline_mode "$base_mode"
 
-        # 3. Gating Hypothesis Analysis
+        # 3. GLM Stats and Plotting (Screening)
+        for model in "ModelA" "ModelB" "ModelC" "ModelD"; do
+            run python3 code/glm_analysis/run_glm_stats.py \
+                --data_type "$data_type" \
+                --baseline_mode "$base_mode" \
+                --model "$model"
+            run python3 code/glm_analysis/plot_glm_results.py \
+                --data_type "$data_type" \
+                --baseline_mode "$base_mode" \
+                --model "$model"
+        done
+
+        # 4. Cluster-based Permutation Testing (Scientific Significance)
+        # Model B: Test Length and Surprisal
+        for pred in "Length_c" "Surprisal"; do
+            run python3 code/glm_analysis/run_glm_permutation.py \
+                --data_type "$data_type" \
+                --baseline_mode "$base_mode" \
+                --model "ModelB" \
+                --predictor "$pred"
+        done
+
+        # Model C: Test MDL
+        run python3 code/glm_analysis/run_glm_permutation.py \
+            --data_type "$data_type" \
+            --baseline_mode "$base_mode" \
+            --model "ModelC" \
+            --predictor "MDL"
+
+        # Model D: Competition (Test MDL, Length, and Surprisal)
+        for pred in "MDL" "Length_c" "Surprisal"; do
+            run python3 code/glm_analysis/run_glm_permutation.py \
+                --data_type "$data_type" \
+                --baseline_mode "$base_mode" \
+                --model "ModelD" \
+                --predictor "$pred"
+        done
+
+        # 5. Gating Hypothesis Analysis
         run python3 code/analysis/analyze_gating_hypothesis.py \
             --data_type "$data_type" \
             --baseline_mode "$base_mode"
 
-        # 4. Waveform Morphology (Latency & RSI)
+        # 6. Waveform Morphology (Latency & RSI)
         run python3 code/analysis/analyze_gating_latency_rsi.py \
             --data_type "$data_type" \
             --baseline_mode "$base_mode"
 
-        # 5. Unique Variance Analysis (Delta R^2)
+        # 7. Unique Variance Analysis (Delta R^2)
         run python3 code/analysis/analyze_unique_variance.py \
             --data_type "$data_type" \
             --baseline_mode "$base_mode"
     done
 done
-
-# Note: Cluster-based permutation testing (run_glm_permutation.py) is a
-# computationally intensive step and is intended to be run manually
-# after verifying the main GLM results.
-# Example command for one model:
-# python3 code/glm_analysis/run_glm_permutation.py \
-#     --data_type "erp" --baseline_mode "local" --model "C"
 
 
 # --- Phase 3: Multi-modal / Cross-type Analyses ---
@@ -112,7 +143,7 @@ run python3 code/analysis/analysis_frequency.py
 run python3 code/analysis/analysis_frequency_itc.py
 run python3 code/analysis/analyze_baseline_state.py
 run python3 code/analysis/analyze_neural_trajectory.py
-run python3 code/analysis/analysis_mmn_roi.py
+run python3 code/analysis/analyze_mmn_regression.py
 
 # Special: Resource Constraints depends on specifically Model C results.
 # This now calls the script with arguments, removing the need for `cp`.
