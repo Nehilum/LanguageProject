@@ -47,14 +47,18 @@ def run(cmd_args):
         cmd_args,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
-        text=True,
+        text=False, # Read as bytes to avoid cp1252/cp932 decoding errors
         bufsize=1
     )
 
-    for line in process.stdout:
-        print(line, end="", flush=True)
+    for line_bytes in iter(process.stdout.readline, b''):
+        # Decode ignoring errors, then encode to console safe, or just let python handle it cleanly 
+        line_str = line_bytes.decode('utf-8', errors='replace')
+        sys.stdout.buffer.write(line_str.encode(sys.stdout.encoding or 'utf-8', errors='replace'))
+        sys.stdout.flush()
+        
         with open(LOG_FILE, "a", encoding="utf-8") as f:
-            f.write(line)
+            f.write(line_str)
 
     process.wait()
     if process.returncode != 0:
