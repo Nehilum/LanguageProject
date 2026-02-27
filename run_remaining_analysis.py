@@ -61,25 +61,79 @@ PYTHON_EXE = sys.executable
 DATA_TYPES = ["erp", "hfa"]
 BASELINE_MODES = ["local", "global"]
 
-log_print("\n>>> Phase 2 (Resumed): Unique Variance Analysis (Delta R^2)")
+log_print("\n>>> Phase 2 (Resumed): Hierarchical GLM & Gating Analysis")
 
-# The user's log shows failure occurred at:
-# analyze_unique_variance.py --data_type erp --baseline_mode local
-# We will start exactly there and continue exactly as the original script.
-
-# Resuming the tail end of Phase 2
+# Step 7 of erp/local which failed:
+log_print("\n--- Processing: Type=erp, Baseline=local ---")
 run([PYTHON_EXE, "code/analysis/analyze_unique_variance.py", 
      "--data_type", "erp", 
      "--baseline_mode", "local"])
 
-# The inner loop for 'global' 'erp', and then the entire loop for 'hfa'
-run([PYTHON_EXE, "code/analysis/analyze_unique_variance.py", 
-     "--data_type", "erp", 
-     "--baseline_mode", "global"])
+# The remaining combinations:
+remaining_combos = [
+    ("erp", "global"),
+    ("hfa", "local"),
+    ("hfa", "global")
+]
 
-for base_mode in BASELINE_MODES:
+for data_type, base_mode in remaining_combos:
+    log_print(f"\n--- Processing: Type={data_type}, Baseline={base_mode} ---")
+
+    # 1. Prepare GLM Data (H5 Generation)
+    run([PYTHON_EXE, "code/glm_analysis/prepare_glm_data.py", 
+         "--data_type", data_type, 
+         "--baseline_mode", base_mode])
+
+    # 2. Fit Hierarchical GLM (Level 1 & 2)
+    run([PYTHON_EXE, "code/glm_analysis/run_glm_hierarchical.py", 
+         "--data_type", data_type, 
+         "--baseline_mode", base_mode])
+
+    # 3. GLM Stats and Plotting (Screening)
+    for model in ["ModelA", "ModelB", "ModelC", "ModelD"]:
+        run([PYTHON_EXE, "code/glm_analysis/run_glm_stats.py", 
+             "--data_type", data_type, 
+             "--baseline_mode", base_mode, 
+             "--model", model])
+        run([PYTHON_EXE, "code/glm_analysis/plot_glm_results.py", 
+             "--data_type", data_type, 
+             "--baseline_mode", base_mode, 
+             "--model", model])
+
+    # 4. Cluster-based Permutation Testing (Scientific Significance)
+    for pred in ["Length_c", "Surprisal"]:
+        run([PYTHON_EXE, "code/glm_analysis/run_glm_permutation.py", 
+             "--data_type", data_type, 
+             "--baseline_mode", base_mode, 
+             "--model", "ModelB", 
+             "--predictor", pred])
+
+    run([PYTHON_EXE, "code/glm_analysis/run_glm_permutation.py", 
+         "--data_type", data_type, 
+         "--baseline_mode", base_mode, 
+         "--model", "ModelC", 
+         "--predictor", "MDL"])
+
+    for pred in ["MDL", "Length_c", "Surprisal"]:
+        run([PYTHON_EXE, "code/glm_analysis/run_glm_permutation.py", 
+             "--data_type", data_type, 
+             "--baseline_mode", base_mode, 
+             "--model", "ModelD", 
+             "--predictor", pred])
+
+    # 5. Gating Hypothesis Analysis
+    run([PYTHON_EXE, "code/analysis/analyze_gating_hypothesis.py", 
+         "--data_type", data_type, 
+         "--baseline_mode", base_mode])
+
+    # 6. Waveform Morphology (Latency & RSI)
+    run([PYTHON_EXE, "code/analysis/analyze_gating_latency_rsi.py", 
+         "--data_type", data_type, 
+         "--baseline_mode", base_mode])
+
+    # 7. Unique Variance Analysis (Delta R^2)
     run([PYTHON_EXE, "code/analysis/analyze_unique_variance.py", 
-         "--data_type", "hfa", 
+         "--data_type", data_type, 
          "--baseline_mode", base_mode])
 
 

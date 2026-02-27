@@ -127,7 +127,7 @@ def main():
             # Let's load predictors first to build lookup.
             
             # Load Predictors with Session ID
-            pred_files = glob.glob(os.path.join(PREDICTORS_ROOT, cond, subj, "*.csv"))
+            pred_files = glob.glob(os.path.join(PREDICTORS_ROOT, cond, subj, "*.parquet"))
             if not pred_files:
                 logger.warning(f"No predictors for {cond}/{subj} in {PREDICTORS_ROOT}")
                 continue
@@ -142,13 +142,13 @@ def main():
                     parts = fname.split('_')
                     # format: predictors_seqver-ver_sid.csv
                     # sid is last part
-                    sid_part = parts[-1].replace(".csv", "")
+                    sid_part = parts[-1].replace(".parquet", "")
                     logger.info(f"Parsed SID: {sid_part} from {fname}")
                 except Exception as e:
                     logger.warning(f"Could not parse session ID from {pf}: {e}")
                     continue
                     
-                tmp_df = pd.read_csv(pf)
+                tmp_df = pd.read_parquet(pf)
                 tmp_df['session_id'] = sid_part # Add column
                 pred_dfs.append(tmp_df)
             
