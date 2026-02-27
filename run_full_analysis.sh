@@ -18,6 +18,7 @@
 set -e # Exit immediately if a command exits with a non-zero status.
 
 # --- Configuration ---
+mkdir -p derivatives
 LOG_FILE="derivatives/pipeline_run_$(date +%Y%m%d_%H%M%S).log"
 export PYTHONUNBUFFERED=1
 
