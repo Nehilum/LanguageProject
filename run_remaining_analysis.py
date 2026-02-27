@@ -20,6 +20,7 @@ os.makedirs("derivatives", exist_ok=True)
 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 LOG_FILE = f"derivatives/pipeline_run_resume_{timestamp}.log"
 os.environ["PYTHONUNBUFFERED"] = "1"
+os.environ["PYTHONUTF8"] = "1"
 
 def log_print(msg, end="\n"):
     print(msg, end=end, flush=True)
