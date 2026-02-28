@@ -7,10 +7,10 @@ from datetime import datetime
 # MonkeyLanguage Analysis Pipeline - Remaining Analysis Execution Script
 # ==============================================================================
 #
-# Purpose: Resumes the analysis pipeline from analyze_unique_variance.py
-#          (the point of failure in Phase 2) onwards.
+# Purpose: Resumes the analysis pipeline from Phase 3, specifically
+#          restarting from analyze_hfa_erp_latency.py (local mode).
 # Author: Antigravity AI
-# Version: 2026-02-27
+# Version: 2026-02-28
 #
 # Usage:
 #   python run_remaining_analysis.py
@@ -58,103 +58,32 @@ def run(cmd_args):
 
 PYTHON_EXE = sys.executable
 
-DATA_TYPES = ["erp", "hfa"]
 BASELINE_MODES = ["local", "global"]
 
-log_print("\n>>> Phase 2 (Resumed): Hierarchical GLM & Gating Analysis")
+# --- Phase 3: Multi-modal / Cross-type Analyses ---
+log_print("\n>>> Phase 3 (Resumed): Coupling & Cross-type Analyses")
 
-# Step 7 of erp/local which failed:
-log_print("\n--- Processing: Type=erp, Baseline=local ---")
-run([PYTHON_EXE, "code/analysis/analyze_unique_variance.py", 
-     "--data_type", "erp", 
+# The user's log shows failure occurred at:
+# analyze_hfa_erp_latency.py --baseline_mode local
+# Gating coupling local already finished right before latency crashed.
+
+log_print("\n--- Processing: Baseline=local ---")
+run([PYTHON_EXE, "code/analysis/analyze_hfa_erp_latency.py", 
      "--baseline_mode", "local"])
 
-# The remaining combinations:
-remaining_combos = [
-    ("erp", "global"),
-    ("hfa", "local"),
-    ("hfa", "global")
-]
+run([PYTHON_EXE, "code/analysis/analyze_pac.py", 
+     "--baseline_mode", "local"])
 
-for data_type, base_mode in remaining_combos:
-    log_print(f"\n--- Processing: Type={data_type}, Baseline={base_mode} ---")
+# Then global baseline for Phase 3
+log_print("\n--- Processing: Baseline=global ---")
+run([PYTHON_EXE, "code/analysis/analyze_gating_coupling.py", 
+     "--baseline_mode", "global"])
 
-    # 1. Prepare GLM Data (H5 Generation)
-    run([PYTHON_EXE, "code/glm_analysis/prepare_glm_data.py", 
-         "--data_type", data_type, 
-         "--baseline_mode", base_mode])
+run([PYTHON_EXE, "code/analysis/analyze_hfa_erp_latency.py", 
+     "--baseline_mode", "global"])
 
-    # 2. Fit Hierarchical GLM (Level 1 & 2)
-    run([PYTHON_EXE, "code/glm_analysis/run_glm_hierarchical.py", 
-         "--data_type", data_type, 
-         "--baseline_mode", base_mode])
-
-    # 3. GLM Stats and Plotting (Screening)
-    for model in ["ModelA", "ModelB", "ModelC", "ModelD"]:
-        run([PYTHON_EXE, "code/glm_analysis/run_glm_stats.py", 
-             "--data_type", data_type, 
-             "--baseline_mode", base_mode, 
-             "--model", model])
-        run([PYTHON_EXE, "code/glm_analysis/plot_glm_results.py", 
-             "--data_type", data_type, 
-             "--baseline_mode", base_mode, 
-             "--model", model])
-
-    # 4. Cluster-based Permutation Testing (Scientific Significance)
-    for pred in ["Length_c", "Surprisal"]:
-        run([PYTHON_EXE, "code/glm_analysis/run_glm_permutation.py", 
-             "--data_type", data_type, 
-             "--baseline_mode", base_mode, 
-             "--model", "ModelB", 
-             "--predictor", pred])
-
-    run([PYTHON_EXE, "code/glm_analysis/run_glm_permutation.py", 
-         "--data_type", data_type, 
-         "--baseline_mode", base_mode, 
-         "--model", "ModelC", 
-         "--predictor", "MDL"])
-
-    for pred in ["MDL", "Length_c", "Surprisal"]:
-        run([PYTHON_EXE, "code/glm_analysis/run_glm_permutation.py", 
-             "--data_type", data_type, 
-             "--baseline_mode", base_mode, 
-             "--model", "ModelD", 
-             "--predictor", pred])
-
-    # 5. Gating Hypothesis Analysis
-    run([PYTHON_EXE, "code/analysis/analyze_gating_hypothesis.py", 
-         "--data_type", data_type, 
-         "--baseline_mode", base_mode])
-
-    # 6. Waveform Morphology (Latency & RSI)
-    run([PYTHON_EXE, "code/analysis/analyze_gating_latency_rsi.py", 
-         "--data_type", data_type, 
-         "--baseline_mode", base_mode])
-
-    # 7. Unique Variance Analysis (Delta R^2)
-    run([PYTHON_EXE, "code/analysis/analyze_unique_variance.py", 
-         "--data_type", data_type, 
-         "--baseline_mode", base_mode])
-
-
-# --- Phase 3: Multi-modal / Cross-type Analyses ---
-log_print("\n>>> Phase 3: Coupling & Cross-type Analyses")
-
-for base_mode in BASELINE_MODES:
-    log_print(f"\n--- Processing: Baseline={base_mode} ---")
-
-    # HFA-ERP Amplitude Coupling
-    run([PYTHON_EXE, "code/analysis/analyze_gating_coupling.py", 
-         "--baseline_mode", base_mode])
-
-    # HFA-ERP Latency Alignment
-    run([PYTHON_EXE, "code/analysis/analyze_hfa_erp_latency.py", 
-         "--baseline_mode", base_mode])
-
-    # Phase-Amplitude Coupling (PAC)
-    run([PYTHON_EXE, "code/analysis/analyze_pac.py", 
-         "--baseline_mode", base_mode])
-
+run([PYTHON_EXE, "code/analysis/analyze_pac.py", 
+     "--baseline_mode", "global"])
 
 # --- Phase 4: Standalone & Specialized Analyses ---
 log_print("\n>>> Phase 4: Standalone & Specialized Analyses")
@@ -173,7 +102,6 @@ if os.path.exists(RESULTS_C_ERP_LOCAL):
          "--output_dir", "derivatives/glm_results"])
 else:
     log_print(f"Warning: {RESULTS_C_ERP_LOCAL} not found. Skipping Resource Constraints analysis.")
-
 
 # --- Phase 5: Visualization ---
 log_print("\n>>> Phase 5: Visualization")

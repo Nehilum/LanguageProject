@@ -232,7 +232,7 @@ def main():
             # HFA: find peak of smoothed envelope amplitude
             hfa_win = Y_hfa[i, idx_lo:idx_hi]
             if len(hfa_win) > 0:
-                hfa_smooth = smooth_signal(hfa_win, fs, sigma_ms=10.0)
+                hfa_smooth = smooth_signal(hfa_win, FS, sigma_ms=10.0)
                 pk = np.argmax(hfa_smooth) + idx_lo
                 t_hfa_peaks[i] = times[pk]
 
@@ -240,7 +240,7 @@ def main():
             # More robust than raw peak for noisy single-trial ERPs
             erp_win = Y_erp[i, idx_lo:idx_hi]
             if len(erp_win) > 0:
-                erp_smooth = smooth_signal(erp_win, fs, sigma_ms=10.0)
+                erp_smooth = smooth_signal(erp_win, FS, sigma_ms=10.0)
                 fa_idx = fractional_area_latency(erp_smooth, fraction=0.5)
                 t_erp_peaks[i] = times[fa_idx + idx_lo]
 
